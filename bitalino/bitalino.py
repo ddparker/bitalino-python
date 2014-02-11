@@ -28,7 +28,7 @@ import numpy
 class BITalino(object):
     
     def __init__(self):
-    	"""
+        """
         BITalino class: interface to the BITalino hardware.
         
         """
@@ -120,13 +120,13 @@ class BITalino(object):
         
         # check type of list of analog channels
         if isinstance(analogChannels, list):
-        	self.analogChannels = analogChannels
+            self.analogChannels = analogChannels
         elif isinstance(analogChannels, tuple):
-        	self.analogChannels = list(analogChannels)
+            self.analogChannels = list(analogChannels)
         elif isinstance(analogChannels, numpy.ndarray):
-        	self.analogChannels = analogChannels.astype('int').tolist()
+            self.analogChannels = analogChannels.astype('int').tolist()
         else:
-        	raise TypeError, "Unsupported analog channels list type."
+            raise TypeError, "Unsupported analog channels list type."
         
         # remove repeats
         self.analogChannels = list(set(self.analogChannels))
@@ -240,13 +240,13 @@ class BITalino(object):
         
         # check type of digital array
         if isinstance(digitalArray, list):
-        	pass
+            pass
         elif isinstance(digitalArray, tuple):
-        	digitalArray = list(digitalArray)
+            digitalArray = list(digitalArray)
         elif isinstance(digitalArray, numpy.ndarray):
-        	digitalArray = digitalArray.astype('int').tolist()
+            digitalArray = digitalArray.astype('int').tolist()
         else:
-        	raise TypeError, "Unsupported digital channels list type."
+            raise TypeError, "Unsupported digital channels list type."
         
         # check items
         pValues = [0, 1]
@@ -276,9 +276,9 @@ class BITalino(object):
         
         # choose serial or socket
         if self.serial:
-        	reader = self.socket.read
+            reader = self.socket.read
         else:
-        	reader = self.socket.recv
+            reader = self.socket.recv
         
         while version[-1] != '\n':
             version += reader(1)
@@ -324,12 +324,12 @@ class BITalino(object):
         
         # choose serial or socket
         if self.serial:
-        	reader = self.socket.read
+            reader = self.socket.read
         else:
-        	reader = self.socket.recv
+            reader = self.socket.recv
         
         # get data according to the value nSamples set
-        dataAcquired = numpy.zeros((5+nChannels,nSamples))
+        dataAcquired = numpy.zeros((5 + nChannels, nSamples))
         Data = ''
         sampleIndex = 0
         while sampleIndex < nSamples:

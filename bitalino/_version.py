@@ -11,4 +11,4 @@ Created on Nov 27 11:25:00 2013
 
 """
 
-__version__ = '0.5'
+__version__ = '0.6'

@@ -30,9 +30,19 @@ Dependencies
 Release Notes
 -------------
 
+Version 0.6
+
+- Serial Baud rate was incorrectly set as 9600, instead of 115200
+- Known issues:
+
+  - *version* method hangs
+
 Version 0.5
 
 - Included GPL license file
+- Known issues:
+
+  - *version* method hangs
 
 Version 0.4
 

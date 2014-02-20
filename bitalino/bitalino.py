@@ -7,7 +7,7 @@ Defines the BITalino class.
 
 Created on Tue Jun 25 13:44:28 2013
 
-@author: Priscila Alves
+@author: Priscila Alves, José Guerreiro, Carlos Carreiras, Hugo Silva
 
 """
 
@@ -75,7 +75,7 @@ class BITalino(object):
                         self.socket = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
                         self.socket.connect((macAddress, 1))
                     else:
-                        self.socket = serial.Serial(macAddress)
+                        self.socket = serial.Serial(macAddress, 115200)
                         self.serial = True
                     time.sleep(2)
                     

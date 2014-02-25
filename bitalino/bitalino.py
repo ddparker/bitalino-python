@@ -81,7 +81,7 @@ class BITalino(object):
         
         # connect socket
         try:
-            if ':' in macAddress and len(macAddress == 17):
+            if ':' in macAddress and len(macAddress) == 17:
                 # bluetooth
                 self.socket = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
                 self.socket.connect((macAddress, 1))
@@ -104,7 +104,7 @@ class BITalino(object):
             variableToSend = int((variableToSend<<6)|0x03)
             self.write(variableToSend)
         except Exception, e:
-            print e
+            print "BITalino.open:", e
             return False
         else:
             self.macAddress = macAddress

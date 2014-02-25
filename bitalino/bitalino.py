@@ -64,49 +64,52 @@ class BITalino(object):
             macAddress (string): MAC address of the bluetooth device
             SamplingRate(int): Sampling frequency (Hz); values available: 1000, 100, 10 and 1
         
-        Output: True or -1 (error)
+        Output: True or False (error)
         """
         
-        Setup = True
-        while Setup:
-            if macAddress != None:
-                try:
-                    if ":" in macAddress and len(macAddress) == 17:
-                        self.socket = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
-                        self.socket.connect((macAddress, 1))
-                    else:
-                        self.socket = serial.Serial(macAddress, 115200)
-                        self.serial = True
-                    time.sleep(2)
-                    
-                    # Configure sampling rate
-                    if SamplingRate == 1000:
-                        variableToSend = 0x03
-                    elif SamplingRate == 100:
-                        variableToSend = 0x02
-                    elif SamplingRate == 10:
-                        variableToSend = 0x01
-                    elif SamplingRate == 1:
-                        variableToSend = 0x00
-                    else:
-                        self.socket.close()
-                        raise TypeError,  "The Sampling Rate %s cannot be set in BITalino. Choose 1000, 100, 10 or 1." % SamplingRate
-                        return -1
-                        
-                    variableToSend = int((variableToSend<<6)|0x03)
-                    self.write(variableToSend)
-                    Setup = False
-                    
-                except Exception, e:
-                    print e
-                    return -1
+        # check inputs
+        if macAddress is None:
+            raise TypeError, "A MAC address or serial port is needed to connect."
+        
+        try:
+            SamplingRate = int(SamplingRate)
+        except Exception, e:
+            raise TypeError, "Unsupported sampling rate type (%s)." % e
+        
+        if SamplingRate not in [1, 10, 100, 1000]:
+            raise ValueError,  "The specified sampling rate %s is not valid; choose 1, 10, 100, or 1000." % SamplingRate
+        
+        # connect socket
+        try:
+            if ':' in macAddress and len(macAddress == 17):
+                # bluetooth
+                self.socket = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+                self.socket.connect((macAddress, 1))
             else:
-                raise TypeError, "A MAC address or serial port is needed to connect"
-                return -1
+                # serial
+                self.socket = serial.Serial(macAddress, 115200)
+                self.serial = True
+            
+            # set sampling rate
+            time.sleep(2)
+            if SamplingRate == 1000:
+                variableToSend = 0x03
+            elif SamplingRate == 100:
+                variableToSend = 0x02
+            elif SamplingRate == 10:
+                variableToSend = 0x01
+            elif SamplingRate == 1:
+                variableToSend = 0x00
+            
+            variableToSend = int((variableToSend<<6)|0x03)
+            self.write(variableToSend)
+        except Exception, e:
+            print e
+            return False
         else:
             self.macAddress = macAddress
             return True
-
+    
     def start(self, analogChannels=[0, 1, 2, 3, 4, 5]):
         """
         Starts Acquisition in the analog channels set.

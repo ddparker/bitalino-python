@@ -1,6 +1,8 @@
-===================
 BITalino Python API
 ===================
+
+.. image:: https://badge.fury.io/py/bitalino.png
+    :target: http://badge.fury.io/py/bitalino
 
 BITalino is a low-cost toolkit that allows anyone to create projects and applications with body signals.
 Out of the box, BITalino has easy-to-use hardware with sensors for ECG, EMG, EDA, Motion and Light.
@@ -26,6 +28,13 @@ Dependencies
 
   - Source: https://code.google.com/p/pybluez/downloads/list
   - Windows binaries: http://www.lfd.uci.edu/~gohlke/pythonlibs/#pybluez
+
+Installation
+------------
+
+To install, simply do: ::
+
+    $ pip install bitalino
 
 Release Notes
 -------------

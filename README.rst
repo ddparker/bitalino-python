@@ -3,6 +3,8 @@ BITalino Python API
 
 .. image:: https://badge.fury.io/py/bitalino.png
     :target: http://badge.fury.io/py/bitalino
+.. image:: https://badge.fury.io/gh/bitalino%2Fbitalino-python.png
+    :target: http://badge.fury.io/gh/bitalino%2Fbitalino-python
 
 BITalino is a low-cost toolkit that allows anyone to create projects and applications with body signals.
 Out of the box, BITalino has easy-to-use hardware with sensors for ECG, EMG, EDA, Motion and Light.

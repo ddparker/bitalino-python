@@ -1,14 +1,16 @@
-# -*- coding: utf-8 -*-
+# # -*- coding: utf-8 -*-
 
-"""
-BITalino API
+""" 
+.. module:: bitalino
+   :platform: Windows
+   :synopsis: BITalino API
 
-Defines the BITalino class.
+.. moduleauthor:: Priscila Alves <@plux.info>
+.. moduleauthor:: José Guerreiro <@plux.info>
+.. moduleauthor:: Carlos Carreiras <@plux.info>
+.. moduleauthor:: Hugo Silva <@plux.info>
 
-Created on Tue Jun 25 13:44:28 2013
-
-@author: Priscila Alves, José Guerreiro, Carlos Carreiras, Hugo Silva
-
+*Created on Tue Jun 25 13:44:28 2013*
 """
 
 
@@ -24,14 +26,10 @@ import math
 import numpy
 
 
-
 class BITalino(object):
+    """**BITalino Class**: Interface to the **BITalino** Hardware."""
     
     def __init__(self):
-        """
-        BITalino class: interface to the BITalino hardware.
-        
-        """
         self.socket = None
         self.analogChannels = []
         self.number_bytes = None
@@ -40,9 +38,20 @@ class BITalino(object):
     
     def find(self, serial=False):
         """
-        Search for bluetooth devices nearby
+        :param serial: Serial port (True) or MAC address (False)
+        :type serial: bool.
+        :returns: MAC address or serial of each device found
+
+        Searches for bluetooth devices nearby.
         
-        Output: tuple with name and mac address of each device found
+        Possible return formats:
+        
+        =========  ===================================================== =====================
+        *serial*   Returns                                                Examples              
+        =========  ===================================================== =====================
+        True       List of port names containing ``bitalino`` or ``COM`` ``['COM1','COM3']``
+        False      List of (tuples) with MAC address and name            ``[('00:0a:95:9d:68:16','bitalino_name')]``
+        =========  ===================================================== =====================
         """
         
         try:
@@ -56,15 +65,30 @@ class BITalino(object):
     
     def open(self, macAddress=None, SamplingRate=1000):
         """
-        Connect to bluetooth device with the mac address provided. 
-        Configure the sampling Rate. 
+        :param macAddress: MAC address or serial port of the bluetooth device
+        :type macAddress: str.
+        :param SamplingRate: Sampling frequency (Hz)
+        :type SamplingRate: int.
+        :returns: True (Ok) or False (Error)
+        :raises TypeError: When MAC address or serial port are not defined
+        :raises TypeError: When sampling rate type is not supported
+        :raises ValueError: When sampling rate value is not valid
+             
+        Connects to the bluetooth device with the MAC address or serial port provided and configures the sampling rate. Setting the sampling
+        rate on the device implies the use of the method :meth:`write`
         
-        Kwargs:
-            
-            macAddress (string): MAC address of the bluetooth device
-            SamplingRate(int): Sampling frequency (Hz); values available: 1000, 100, 10 and 1
+        Possible values for parameter *macAddress*:
         
-        Output: True or False (error)
+        * MAC address: e.g. ``00:0a:95:9d:68:16``
+        * Serial port - number: number of the device, numbering starts at zero
+        * Serial port - device name: depending on the operating system. e.g. ``COM3`` on Windows; ``/dev/tty.bitalino-DevB`` on Mac OS X; ``/dev/ttyUSB0`` on GNU/Linux.
+        
+        Possible values for parameter *SamplingRate*:
+        
+        * 1
+        * 10
+        * 100
+        * 1000
         """
         
         # check inputs
@@ -112,13 +136,26 @@ class BITalino(object):
     
     def start(self, analogChannels=[0, 1, 2, 3, 4, 5]):
         """
-        Starts Acquisition in the analog channels set.
+        :param analogChannels: Channels to be acquired
+        :type analogChannels: array, tuple or list of int.
+        :returns: True (Ok)
+        :raises TypeError: When list of analog channels is not supported
+        :raises TypeError: When set of analog channels is not valid
+        :raises TypeError: When a connection to the device is not open
+             
+        Starts acquisition in the analog channels set. Starting the acquisition in the 
+        defined analog channels implies the use of the method :meth:`write`
         
-        Kwargs:
-            
-            analogChannels (array of int): channels to be acquired (from 0 to 5)
+        Possible values, types, configurations and examples for parameter *analogChannels*:
         
-        Output: True
+        ===============  ====================================
+        Values           0, 1, 2, 3, 4, 5
+        Types            list ``[]``, tuple ``()``, array ``[[]]``
+        Configurations   Any number of channels, identified by their value
+        Examples         ``[0, 3, 4]``, ``(1, 2, 3, 5)``
+        ===============  ====================================
+        
+        .. note:: To obtain the samples, use method :meth:`read`
         """
         
         # check type of list of analog channels
@@ -152,9 +189,10 @@ class BITalino(object):
     
     def stop(self):
         """
-        Sends state value 0 to stop BITalino acquisition.
+        :returns: True (Ok)
+        :raises TypeError: When a connection to the device is not open
         
-        Output: True
+        Stops acquisition. Stoping the acquisition implies the use of the method :meth:`write`
         """
         
         if self.socket is None:
@@ -167,9 +205,10 @@ class BITalino(object):
     
     def close(self):
         """
-        Closes bluetooth socket
+        :returns: True (Ok)
+        :raises TypeError: When a connection to the device is not open
         
-        Output: True
+        Closes the bluetooth socket
         """
         
         # Check
@@ -182,9 +221,10 @@ class BITalino(object):
     
     def write(self, data=0):
         """
-        Send a command to BITalino
+        :returns: True (Ok)
+        :raises TypeError: When a connection to the device is not open
         
-        Output: True
+        Sends a command to the BITalino device 
         """
         if self.socket is None:
             raise TypeError, "An input connection is needed."
@@ -198,16 +238,24 @@ class BITalino(object):
     
     def battery(self, value=0):
         """
-        Set the battery threshold of BITalino
-        Works only in idle mode
+        :param value: Threshold value [0 - 63]
+        :type value: int.
+        :returns: True (Ok)
+        :raises TypeError: When a connection to the device is not open
+        :raises TypeError: When the threshold value is invalid
         
-        Kwargs:
-            
-            value (int): threshold value from 0 to 63
-                0  -> 3.4V
-                63 -> 3.8V
-                
-        Output: True
+        Sets the battery threshold for the BITalino device. Setting the battery threshold implies the use of the method :meth:`write`
+        
+        Possible values for parameter *value*:
+        
+        ===============  =======  =====================
+        Range            *value*  Corresponding threshold (Volts)               
+        ===============  =======  =====================
+        Minimum *value*  0        3.4 Volts
+        Maximum *value*  63       3.8 Volts
+        ===============  =======  =====================
+        
+        .. warning:: Only works in IDLE mode       
         """
         
         if self.socket is None:
@@ -224,18 +272,25 @@ class BITalino(object):
     
     def trigger(self, digitalArray=[0, 0, 0, 0]):
         """
-        Act on digital output channels of BITalino
-        Works only during acquisition mode
-        
-        Kwargs:
-            
-            digitalArray (array): array of size 4 which act on digital outputs according to the value: 0 or 1
-                Each position of the array corresponds to a digital output, in ascending order.
-                
-                Example:
-                    digitalArray =[1,0,1,0] -> Digital 0 and 2 will be set to one and Digital 1 and 3 to zero
-        
-        Output: True
+        :param digitalArray: Array which acts on digital outputs according to the value: 0 or 1
+        :type digitalArray: array, tuple or list of int.
+        :returns: True (Ok)
+        :raises TypeError: When list of digital channels output is not supported
+        :raises TypeError: When set of digital channels output is not valid
+        :raises TypeError: When a connection to the device is not open
+             
+        Acts on digital output channels of the BITalino device. Triggering these digital outputs implies the use of the method :meth:`write`
+       
+        Each position of the array *digitalArray* corresponds to a digital output, in ascending order. Possible values, types, configurations and examples for parameter *digitalArray*:
+
+        ===============  ====================================
+        Values           0 or 1
+        Types            list ``[]``, tuple ``()``, array ``[[]]``
+        Configurations   4 values, one for each digital channel output
+        Examples         ``[1, 0, 1, 0]``: Digital 0 and 2 will be set to 1 while Digital 1 and 3 will be set to 0
+        ===============  ====================================    
+       
+        .. warning:: Only works during acquisition mode          
         """
         
         if self.socket is None:
@@ -265,10 +320,12 @@ class BITalino(object):
     
     def version(self):
         """
-        Get BITalino version
-        Works only in idle mode
+        :returns: (str.) Version of BITalino 
+        :raises TypeError: When a connection to the device is not open
         
-        Output: Version (string)
+        Retrieves the BITalino version. Retrieving the version implies the use of the method :meth:`write`
+
+        .. warning:: Only works in IDLE mode
         """
         
         if self.socket is None:
@@ -290,29 +347,36 @@ class BITalino(object):
     
     def read(self, nSamples=100):
         """
-        Acquire defined number of samples from BITalino
+        :param nSamples: Number of samples to acquire
+        :type nSamples: int.
+        :returns: (array) Data acquired
+        :raises TypeError: When a connection to the device is not open
         
-        Kwargs: 
-            nSamples (int): number of samples
+        Acquires a defined number of samples (`nSamples`) from BITalino. Reading samples from BITalino implies the use of the method :meth:`decode`
+        
+        Requiring a low number of samples (e.g. ``nSamples = 1``) may be computationally expensive; it is recommended to acquire batches of samples (e.g. ``nSamples = 100``)
 
-        Output:
-            dataAcquired (array): the data acquired is organized in a matrix; The columns correspond to the sequence number, 4 digital channels and analog channels, as configured previously on the start method; 
-                                Each line correspond to a sample.
-
-                                The organization of the array is as follows:
-                                --  Always included --
-                                Column 0 - Sequence Number
-                                Column 1 - Digital 0
-                                Column 2 - Digital 1
-                                Column 3 - Digital 2
-                                Column 4 - Digital 3
-                                -- Variable with the analog channels set on start method --
-                                Column 5  - analogChannels[0]
-                                Column 6  - analogChannels[1]
-                                Column 7  - analogChannels[2]
-                                Column 8  - analogChannels[3]
-                                Column 9  - analogChannels[4]
-                                Column 10 - analogChannels[5]
+        The data acquired is organized in a matrix whose lines correspond to samples and the columns are as follows:
+        
+        * Sequence Number
+        * 4 Digital Channels (always present)
+        * 1-6 Analog Channels (as defined in the :meth:`start` method)
+        
+        Example matrix for ``analogChannels = [0, 1, 3]`` used in :meth:`start` method
+        
+        ==================  ========= ========= ========= ========= ======== ======== ========
+        Sequence Number*    Digital 0 Digital 1 Digital 2 Digital 3 Analog 0 Analog 1 Analog 3              
+        ==================  ========= ========= ========= ========= ======== ======== ========
+        0                   
+        1 
+        (...)
+        15
+        0
+        1
+        (...)
+        ==================  ========= ========= ========= ========= ======== ======== ========
+        
+        .. note:: *The sequence number overflows at 15 
         """
         
         if self.socket is None:
@@ -353,15 +417,13 @@ class BITalino(object):
     
     def decode(self, data, nAnalog=None):
         """
-        Unpack data samples.
+        :param data: Data to be decoded
+        :type data: array
+        :param nAnalog: Number of analog channels contained in the data
+        :type nAnalog: int    
+        :returns: (array) Data decoded
         
-        Kwargs:
-            
-            data (array): received data
-            nAnalog (int): number of analog channels contained in data
-        
-        Output:
-            res(array): data unpacked
+        Unpacks data samples acquired from BITalino (bytes) to hexadecimal. 
         """
         
         if nAnalog == None: nAnalog = len(self.analogChannels)
@@ -463,8 +525,6 @@ class BITalino(object):
             return res
         else:
             return []
-
-
 
 if __name__ == '__main__':
     
